@@ -20,6 +20,7 @@ map <Leader><leader>h <Plug>(easymotion-linebackward)
 map <Leader><Leader>j <Plug>(easymotion-j)
 map <Leader><Leader>k <Plug>(easymotion-k)
 map <Leader><leader>l <Plug>(easymotion-lineforward)
+" 重复上一次操作, 类似repeat插件, 很强大
 map <Leader><leader>. <Plug>(easymotion-repeat)
 
 
@@ -181,7 +182,7 @@ map <F2> :NERDTreeToggle<CR>
 "close vim if the only window left open is a NERDTree
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
-
+"cpp enhance highlight config
 let g:cpp_class_scope_highlight = 1
 let g:cpp_member_variable_highlight = 1
 let g:cpp_class_decl_highlight = 1
@@ -222,3 +223,31 @@ set history=1000
 set autoread
 set wildmenu
 set wildmode=longest:list,full
+
+
+autocmd BufNewFile *.c,*.cpp,*.sh,*.py exec ":call SetTitle()"
+func SetTitle()
+        if (&filetype == 'c' || &filetype == 'cpp')
+                call setline(1, "/*************************************************************************")
+                call setline(2, "\ @Author: Neil<laijingzhi@foxmail.com>")
+                call setline(3, "\ @Created Time : ".strftime("%Y-%m-%d %T"))
+                call setline(4, " ************************************************************************/")
+                call setline(5,"")
+        endif
+        if &filetype == 'sh'
+                call setline(1, "\#!/bin/sh")
+                call setline(2, "\# Author: Neil<laijingzhi@foxmail.com>")
+                call setline(3, "\# Created Time : ".strftime("%Y-%m-%d %T"))
+                call setline(4,"")
+        endif
+        if &filetype == 'python'
+                call setline(1, "\#!/usr/bin/python")
+                call setline(2, "\# -*- coding=utf8 -*-")
+                call setline(3, "\"\"\"")
+                call setline(4, "\ Author: Neil<laijingzhi@foxmail.com>")
+                call setline(5, "\ Created Time : ".strftime("%Y-%m-%d %T"))
+                call setline(6, "\"\"\"")
+                call setline(7,"")
+        endif
+endfunc
+autocmd BufNewfile * normal G
