@@ -7,7 +7,8 @@ imap hh <C-y>,
 let mapleader=";"
 
 inoremap jj <ESC>
-nnoremap <Leader>w :w<CR> 
+nnoremap <Leader>w :w<cr> 
+nnoremap <Leader>q :q<cr> 
 nnoremap <Leader>ww :wa<cr>  
 "air line config
 let g:airline#extensions#tabline#enabled = 1
