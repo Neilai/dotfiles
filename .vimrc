@@ -1,30 +1,3 @@
-inoremap  <C-h>   <Left>
-inoremap  <C-j>   <Down>
-inoremap  <C-k>   <Up>
-inoremap  <C-l>   <Right>
-inoremap  <C-d>   <DELETE>
-imap hh <C-y>,
-let mapleader=";"
-
-inoremap jj <ESC>
-nnoremap <Leader>w :w<cr> 
-nnoremap <Leader>q :q<cr> 
-nnoremap <Leader>ww :wa<cr>  
-"air line config
-let g:airline#extensions#tabline#enabled = 1
-
-
-"easymotion config
-let g:EasyMotion_smartcase = 1
-"let g:EasyMotion_startofline = 0 " keep cursor colum when JK motion
-map <Leader><leader>h <Plug>(easymotion-linebackward)
-map <Leader><Leader>j <Plug>(easymotion-j)
-map <Leader><Leader>k <Plug>(easymotion-k)
-map <Leader><leader>l <Plug>(easymotion-lineforward)
-map <Leader><leader>. <Plug>(easymotion-repeat)
-
-
-
 set nocompatible              " required
 filetype off                  " required
 set rtp+=~/.vim/bundle/Vundle.vim
@@ -47,9 +20,73 @@ Plugin 'easymotion/vim-easymotion'
 Plugin 'tpope/vim-fugitive'
 Plugin 'posva/vim-vue'
 Plugin 'mxw/vim-jsx'
+Plugin 'hail2u/vim-css3-syntax'     
+Plugin 'cakebaker/scss-syntax.vim'
+Plugin 'Raimondi/delimitMate'
 Plugin 'pangloss/vim-javascript'
+Plugin 'dense-analysis/ale'
+Plugin 'adelarsq/vim-matchit'
 call vundle#end()            " required
 filetype plugin indent on    " required
+
+
+inoremap  <C-h>   <Left>
+inoremap  <C-j>   <Down>
+inoremap  <C-k>   <Up>
+inoremap  <C-l>   <Right>
+inoremap  <C-d>   <DELETE>
+imap hh <C-y>,
+let mapleader=";"
+
+inoremap jj <ESC>
+nnoremap <Leader>w :w<cr> 
+nnoremap <Leader>q :q<cr> 
+nnoremap <Leader>ww :wa<cr>  
+"air line config
+let g:airline#extensions#tabline#enabled = 1
+
+"ale config
+
+"始终开启标志列
+let g:ale_sign_column_always = 1
+let g:ale_set_highlights = 0
+"自定义error和warning图标
+let g:ale_sign_error = '✗'
+let g:ale_sign_warning = '⚡'
+"在vim自带的状态栏中整合ale
+let g:ale_statusline_format = ['✗ %d', '⚡ %d', '✔ OK']
+"显示Linter名称,出错或警告等相关信息
+let g:ale_echo_msg_error_str = 'E'
+let g:ale_echo_msg_warning_str = 'W'
+let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+"普通模式下，sp前往上一个错误或警告，sn前往下一个错误或警告
+nmap sp <Plug>(ale_previous_wrap)
+nmap sn <Plug>(ale_next_wrap)
+"<Leader>s触发/关闭语法检查
+nmap <Leader>s :ALEToggle<CR>
+"<Leader>d查看错误或警告的详细信息
+nmap <Leader>d :ALEDetail<CR>
+"使用clang对c和c++进行语法检查，对python使用pylint进行语法检查
+let g:ale_linters = {
+\   'c++': ['clang'],
+\   'c': ['clang'],
+\   'python': ['pylint'],
+\   'javascript': ['eslint'],
+\}
+" }}}
+
+"easymotion config
+let g:EasyMotion_smartcase = 1
+"let g:EasyMotion_startofline = 0 " keep cursor colum when JK motion
+map <Leader><leader>h <Plug>(easymotion-linebackward)
+map <Leader><Leader>j <Plug>(easymotion-j)
+map <Leader><Leader>k <Plug>(easymotion-k)
+map <Leader><leader>l <Plug>(easymotion-lineforward)
+" 重复上一次操作, 类似repeat插件, 很强大
+map <Leader><leader>. <Plug>(easymotion-repeat)
+
+
+
 
 colorscheme molokai
 
@@ -81,6 +118,7 @@ let g:ycm_server_log_level = 'info'
 let g:ycm_min_num_identifier_candidate_chars = 2
 let g:ycm_collect_identifiers_from_comments_and_strings = 1
 let g:ycm_complete_in_strings=1
+inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<CR>" |   
 let g:ycm_key_invoke_completion = '<c-z>'
 highlight PMenu ctermfg=0 ctermbg=242 guifg=black guibg=darkgrey
 highlight PMenuSel ctermfg=242 ctermbg=8 guifg=darkgrey guibg=black
@@ -114,6 +152,7 @@ nnoremap <F10> :call asyncrun#quickfix_toggle(6)<cr>
 map <F5> :call CompileRunGcc()<CR>
 func! CompileRunGcc()
         exec "w"
+        echo &filetype
         if &filetype == 'c'
                 exec "AsyncRun gcc % -o %< && ./%<"
         elseif &filetype == 'cpp'
@@ -127,7 +166,7 @@ func! CompileRunGcc()
                 exec "AsyncRun python %"
         elseif &filetype == 'html'
                 exec "!open %"
-        elseif &filetype == 'javascript'
+        elseif &filetype == 'javascript.jsx'
                 exec "AsyncRun node %"
         endif
 endfunc
@@ -187,6 +226,7 @@ let g:cpp_class_scope_highlight = 1
 let g:cpp_member_variable_highlight = 1
 let g:cpp_class_decl_highlight = 1
 
+set foldmethod=manual
 set backspace=indent,eol,start
 set clipboard=unnamed
 syntax on
