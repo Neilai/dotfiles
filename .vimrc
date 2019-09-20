@@ -22,13 +22,42 @@ Plugin 'posva/vim-vue'
 Plugin 'mxw/vim-jsx'
 Plugin 'hail2u/vim-css3-syntax'     
 Plugin 'cakebaker/scss-syntax.vim'
-Plugin 'Raimondi/delimitMate'
+Plugin 'jiangmiao/auto-pairs'
 Plugin 'pangloss/vim-javascript'
 Plugin 'dense-analysis/ale'
 Plugin 'adelarsq/vim-matchit'
+Plugin 'maksimr/vim-jsbeautify'
+Plugin 'marijnh/tern_for_vim'
+Plugin 'Chiel92/vim-autoformat'
+Plugin 'vim-airline/vim-airline-themes'
+Plugin 'tpope/vim-repeat'
+Plugin 'arithran/vim-delete-hidden-buffers'
+Plugin 'SirVer/ultisnips'
+Plugin 'honza/vim-snippets'
+Plugin 'roxma/vim-paste-easy'
+Plugin 'suan/vim-instant-markdown',{'rtp': 'after'}
+Plugin 'chr4/nginx.vim'
+"Plugin 'terryma/vim-multiple-cursors'
+"Plugin 'luochen1990/rainbow'
 call vundle#end()            " required
 filetype plugin indent on    " required
 
+let mapleader=";"
+
+let g:AutoPairsMapCh = 0
+"inoremap " ""<left>
+"inoremap ' ''<left>
+"inoremap ( ()<left>
+"inoremap [ []<left>
+"inoremap { {}<left>
+"inoremap {<CR> {<CR>}<ESC>O
+"inoremap {;<CR> {<CR>};<ESC>O
+
+nnoremap <Leader>1   <C-w>v
+nnoremap <Leader>2   <C-w>s 
+
+
+nnoremap <Leader>h :DeleteHiddenBuffers<CR>
 
 inoremap  <C-h>   <Left>
 inoremap  <C-j>   <Down>
@@ -36,15 +65,33 @@ inoremap  <C-k>   <Up>
 inoremap  <C-l>   <Right>
 inoremap  <C-d>   <DELETE>
 imap hh <C-y>,
-let mapleader=";"
 
-inoremap jj <ESC>
+"inoremap jj <ESC>
 nnoremap <Leader>w :w<cr> 
 nnoremap <Leader>q :q<cr> 
+nnoremap <Leader>qq :q!<cr> 
+inoremap <leader>w <Esc>:w<cr>
+inoremap <leader>q <Esc>:q<cr>
 nnoremap <Leader>ww :wa<cr>  
+nnoremap K  i<cr><Esc>  
 "air line config
 let g:airline#extensions#tabline#enabled = 1
+nmap <tab> :bn<cr>
+let g:airline_theme='dark'
 
+autocmd BufEnter,BufRead *.vue set filetype=vue.javascript
+autocmd FileType javascript noremap <buffer>  <c-f> :call JsxBeautify()<cr>
+autocmd FileType json noremap <buffer> <c-f> :call JsonBeautify()<cr>
+autocmd FileType jsx noremap <buffer> <c-f> :call JsxBeautify()<cr>
+autocmd FileType html noremap <buffer> <c-f> :call HtmlBeautify()<cr>
+autocmd FileType css,scss  noremap <buffer> <c-f> :call CSSBeautify()<cr>
+autocmd FileType cpp,c,python  noremap <buffer> <c-f> :Autoformat<cr>
+
+"snippet config
+let g:UltiSnipsExpandTrigger="<leader><tab>"
+let g:UltiSnipsJumpForwardTrigger="<leader><tab>"
+let g:UltiSnipsJumpBackwardTrgger="<leader><tab>"
+let g:UltiSnipsListSnippets="<c-e>"
 "ale config
 
 "始终开启标志列
@@ -92,12 +139,11 @@ colorscheme molokai
 
 
 "leaderf config
-let g:Lf_ShortcutF = '<c-p>'
-let g:Lf_ShortcutB = '<m-n>'
-noremap <c-n> :LeaderfMru<cr>
-noremap <m-p> :LeaderfFunction!<cr>
-noremap <m-n> :LeaderfBuffer<cr>
-noremap <m-m> :LeaderfTag<cr>
+let g:Lf_ShortcutF = '<Leader>f'
+let g:Lf_ShortcutB = '<Leader>n'
+noremap <Leader>m :LeaderfMru<cr>
+"noremap <Leader>m :LeaderfFunction!<cr>
+noremap <Leader>n :LeaderfBuffer<cr>
 let g:Lf_StlSeparator = { 'left': '', 'right': '', 'font': '' }
 
 let g:Lf_RootMarkers = ['.project', '.root', '.svn', '.git']
@@ -112,6 +158,9 @@ let g:Lf_PreviewResult = {'Function':0, 'BufTag':0}
 
 
 " ycm config
+let g:ycm_confirm_extra_conf = 0
+let g:ycm_use_clangd = 0
+let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.p'
 let g:ycm_add_preview_to_completeopt = 0
 let g:ycm_show_diagnostics_ui = 0
 let g:ycm_server_log_level = 'info'
@@ -119,7 +168,9 @@ let g:ycm_min_num_identifier_candidate_chars = 2
 let g:ycm_collect_identifiers_from_comments_and_strings = 1
 let g:ycm_complete_in_strings=1
 inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<CR>" |   
+"更改语义触发
 let g:ycm_key_invoke_completion = '<c-z>'
+"更改配色
 highlight PMenu ctermfg=0 ctermbg=242 guifg=black guibg=darkgrey
 highlight PMenuSel ctermfg=242 ctermbg=8 guifg=darkgrey guibg=black
 set completeopt=menu,menuone
@@ -128,7 +179,7 @@ noremap <c-z> <NOP>
 
 let g:ycm_semantic_triggers =  {
            \ 'c,cpp,python,java,go,erlang,perl': ['re!\w{2}'],
-           \ 'cs,lua,javascript': ['re!\w{2}'],
+           \ 'cs,lua,javascript,css,scss,less': ['re!\w{2}'],
            \ }
 
 
@@ -170,6 +221,33 @@ func! CompileRunGcc()
                 exec "AsyncRun node %"
         endif
 endfunc
+
+
+
+
+"nerdcommenter config
+let g:ft=""
+function! NERDCommenter_before()
+  if &ft == 'vue'
+    let g:ft = 'vue'
+    let stack = synstack(line('.'), col('.'))
+    if len(stack) > 0
+      let syn = synIDattr((stack)[0], 'name')
+      if len(syn) > 0
+        exe 'setf ' . substitute(tolower(syn), '^vue_', '', '')
+      endif
+    endif
+  endif
+endfunction
+
+function! NERDCommenter_after()
+  if g:ft == 'vue'
+    setf vue
+    let g:ft = ''
+  endif
+endfunction
+
+
 
 
 
@@ -220,6 +298,10 @@ autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in
 map <F2> :NERDTreeToggle<CR>
 "close vim if the only window left open is a NERDTree
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+"let NERDTreeShowHidden=1
+
+
+
 
 "cpp enhance highlight config
 let g:cpp_class_scope_highlight = 1
@@ -235,10 +317,11 @@ set mouse=a
 set encoding=utf-8 
 set t_Co=256
 filetype indent on
-
-set autoindent
+set cursorline
+"set autoindent
+"set smartindent
 set tabstop=2
-set shiftwidth=4
+set shiftwidth=2
 set expandtab
 set softtabstop=2
 
@@ -291,3 +374,4 @@ func SetTitle()
         endif
 endfunc
 autocmd BufNewfile * normal G
+set shell=bash\ -i
